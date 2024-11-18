@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Patient</title>
+    <style>
+        /* General Reset */
+        body, h1, label, button {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #2c3e50; /* Darker blue for the header */
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background-color: #ffffff; /* White background for form */
+            border: 2px solid #dfe6e9; /* Light grey border */
+            border-radius: 12px;
+            padding: 40px 50px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: bold;
+            color: #34495e; /* Medium blue-gray */
+            font-size: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #ced6e0; /* Light grey border */
+            border-radius: 8px;
+            font-size: 1.2rem;
+        }
+
+        input:focus {
+            border-color: #3498db; /* Highlight on focus */
+            outline: none;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+        }
+
+        button {
+            background-color: #27ae60; /* Green color */
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2ecc71; /* Lighter green on hover */
+        }
+
+        #responseMessage {
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: #e74c3c; /* Red for error messages */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            form {
+                width: 90%;
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            button {
+                font-size: 1.3rem;
+                padding: 15px;
+            }
+        }
+    </style>
+    <script>
+        // Function to handle the form submission and send data to the backend
+        async function addPatient() {
+            const name = document.getElementById('name').value;
+            const mailid = document.getElementById('mailid').value;
+
+            // Basic validation
+            if (!name || !mailid) {
+                alert('Please enter both name and email');
+                return;
+            }
+
+            // Prepare the data for POST request
+            const data = {
+                name: name,
+                mailid: mailid
+            };
+
+            // Send POST request to the initial API with the patient's data
+            try {
+                const response = await fetch('http://3.89.140.236:5000/api/send-mails', { // Replace with your initial API endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        emails: [mailid],  // Send the email ID as an array of emails
+                        message: `The patient ${name} has been added to the hospital database.` // Message body
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message); // Success message from API
+                } else {
+                    alert('Error: ' + result.message); // Failure message from API
+                }
+            } catch (error) {
+                console.error('Error sending request:', error);
+                alert('An error occurred while sending the request.');
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Add Patient Information</h1>
+    <form onsubmit="event.preventDefault(); addPatient();">
+        <label for="name">Patient Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="mailid">Email Address:</label>
+        <input type="email" id="mailid" name="mailid" required>
+
+        <button type="submit">Add Patient</button>
+    </form>
+
+    <div id="responseMessage"></div>
+</body>
+</html>
